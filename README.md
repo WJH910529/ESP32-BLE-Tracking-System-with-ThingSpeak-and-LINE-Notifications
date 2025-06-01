@@ -76,6 +76,7 @@ This repository contains a complete solution for tracking BLE devices using an E
     -   Renders historical “in-range / out-of-range” charts (per device) using Chart.js, fetching data from ThingSpeak.
 
  ## System Architecture
+![image](https://github.com/WJH910529/ESP32-BLE-Tracking-System-with-ThingSpeak-and-LINE-Notifications/blob/16f9d62a85be1036ca6d3af263c49867679a4e08/system%20architecture.jpg)
 
 1.  **ESP32**:
     
