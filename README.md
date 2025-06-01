@@ -68,7 +68,14 @@ This repository contains a complete solution for tracking BLE devices using an E
     -   Updates a specified ThingSpeak channel and field (per device) with `1` (in range) or `0` (out of range).
         
     -   Visual historical data is available for each device through ThingSpeak’s JSON API.
-        
+    <p align="center">
+        <img
+            src="https://github.com/WJH910529/ESP32-BLE-Tracking-System-with-ThingSpeak-and-LINE-Notifications/blob/67c7b0752403ed7fb318b652203542479c333aec/picture/tihingspeak.png"
+            alt="line"
+            height="500"
+        />
+    </p>
+
 -   **LINE Notifications**
     
     -   When a tracked device is not found or RSSI falls below threshold, the ESP32 triggers a Google Apps Script endpoint (GAS) to broadcast a LINE message:
