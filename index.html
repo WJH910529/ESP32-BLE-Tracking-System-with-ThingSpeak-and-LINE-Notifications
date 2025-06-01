@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>藍芽裝置追蹤面板</title>
+  <!-- Google Fonts: Noto Sans TC -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body { 
+      background: #f8f9fa;
+      font-family: 'Noto Sans TC', sans-serif;
+    }
+    .card { margin-bottom: 1rem; }
+    #list { max-height: 60vh; overflow-y: auto; }
+    .spinner-overlay {
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(255,255,255,0.7); z-index: 10;
+    }
+    #global-spinner {
+      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(0,0,0,0.3); z-index: 1000;
+    }
+    /* 主標題 */
+    h1 {
+      font-weight: 700;
+      font-size: 2.5rem;
+      color: #343a40;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+    }
+    /* 小標題 */
+    h2.h5 {
+      font-weight: 700;
+      font-size: 1.25rem;
+      color: #495057;
+      border-left: 4px solid #0d6efd;
+      padding-left: .75rem;
+    }
+    #toastContainer {
+      position: fixed; top: 1rem; right: 1rem; z-index: 1200;
+    }
+  </style>
+</head>
+<body>
+  <!-- 全域 loading 遮罩 -->
+  <div id="global-spinner" class="d-none">
+    <div class="spinner-border text-light" role="status" style="width:4rem; height:4rem"></div>
+  </div>
+
+  <!-- Toast Container -->
+  <div id="toastContainer"></div>
+
+  <div class="container py-4">
+    <h1 class="mb-4 text-center">藍芽裝置追蹤面板</h1>
+
+    <!-- 新增追蹤裝置表單 -->
+    <div class="card p-4 shadow-sm bg-white rounded">
+      <h2 class="h5 mb-3">新增追蹤裝置</h2>
+      <form id="frm" class="row g-3">
+        <div class="col-md-4">
+          <label for="mac" class="form-label">MAC 位址</label>
+          <input type="text" class="form-control" id="mac" name="mac" placeholder="AA:BB:CC:DD:EE:FF" required>
+        </div>
+        <div class="col-md-4">
+          <label for="name" class="form-label">裝置名稱</label>
+          <input type="text" class="form-control" id="name" name="name" placeholder="裝置名稱" required>
+        </div>
+        <div class="col-md-2">
+          <label for="field" class="form-label">TS Field</label>
+          <input type="number" class="form-control" id="field" name="field" min="1" max="8" value="1" required>
+        </div>
+        <div class="col-md-2 align-self-end">
+          <button type="submit" class="btn btn-primary w-100">新增</button>
+        </div>
+      </form>
+    </div>
+
+    <div class="row">
+      <!-- 追蹤清單 -->
+      <div class="col-md-4">
+        <div class="card p-3 shadow-sm bg-white rounded h-100">
+          <h2 class="h5 mb-3">追蹤清單</h2>
+          <ul id="list" class="list-group list-group-flush"></ul>
+        </div>
+      </div>
+
+      <!-- 圖表區 -->
+      <div class="col-md-8">
+        <div class="card p-3 shadow-sm bg-white rounded h-100 d-flex flex-column">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h2 class="h5 mb-0">追蹤狀態圖表</h2>
+            <button id="refresh-btn" class="btn btn-outline-secondary btn-sm">重新整理</button>
+          </div>
+          <div id="chart-container" class="position-relative flex-fill">
+            <div id="spinner" class="spinner-overlay d-none">
+              <div class="spinner-border text-primary" role="status"></div>
+            </div>
+            <div id="charts-area"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 刪除確認 Modal -->
+  <div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="confirmModalLabel">刪除確認</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p id="confirmText">確定要刪除嗎？</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+          <button type="button" id="confirmDeleteBtn" class="btn btn-danger">刪除</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS & Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    const GAS_URL = 'https://script.google.com/macros/s/AKfycbypqO1fwAWmgZ_H_5pVfsA81wwn2RBgfRz9EUqnYBA37jKMVFl779FvBDUxCY0ZbgVJqQ/exec';
+    const TS_READ_URL = 'https://api.thingspeak.com/channels/2925984/feeds.json?api_key=5IA8F02MOIS0CP3P&results=100';
+
+    let devices = [], selectedIndex = 0;
+    let tsData = null, tsLastFetch = 0;
+    const CACHE_MS = 60000;
+    const globalSpinner = document.getElementById('global-spinner');
+    const chartSpinner = document.getElementById('spinner');
+    window.chartInstances = [];
+
+    let pendingDelete = { mac: '', name: '' };
+    const confirmModal = new bootstrap.Modal(document.getElementById('confirmModal'));
+    const confirmText = document.getElementById('confirmText');
+    const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+
+    function showToast(message) {
+      const id = 'toast' + Date.now();
+      const html = `
+        <div id="${id}" class="toast align-items-center text-bg-warning border-0 mb-2" role="alert" aria-live="assertive" aria-atomic="true">
+          <div class="d-flex">
+            <div class="toast-body">${message}</div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+          </div>
+        </div>`;
+      const container = document.getElementById('toastContainer');
+      container.insertAdjacentHTML('beforeend', html);
+      const toastEl = document.getElementById(id);
+      new bootstrap.Toast(toastEl, { delay: 4000 }).show();
+    }
+
+    document.getElementById('frm').addEventListener('submit', async e => {
+      e.preventDefault();
+      const mac   = e.target.mac.value.trim();
+      const name  = e.target.name.value.trim();
+      const field = e.target.field.value;
+      if (devices.some(d => String(d.field) === field)) {
+        const dup = devices.find(d => String(d.field) === field);
+        showToast(`Field ${field} 已被 ${dup.name} (${dup.mac}) 使用`);
+        return;
+      }
+      showGlobalLoading(true);
+      await fetch(GAS_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({ mac, name, field })
+      });
+      e.target.reset();
+      await loadList();
+      selectedIndex = devices.length - 1; renderList(); await renderChart(true);
+      showGlobalLoading(false);
+    });
+
+    document.getElementById('refresh-btn').addEventListener('click', () => renderChart(true));
+
+    confirmDeleteBtn.addEventListener('click', async () => {
+      showGlobalLoading(true);
+      await fetch(GAS_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({	action: 'delete', mac: pendingDelete.mac })
+      });
+      confirmModal.hide();
+      await loadList();
+      showGlobalLoading(false);
+    });
+
+    async function loadList() {
+      const res = await fetch(GAS_URL);
+      devices = (await res.json()).devices;
+      renderList(); renderChart();
+    }
+
+    function renderList() {
+      const ul = document.getElementById('list'); ul.innerHTML = '';
+      devices.forEach((d, idx) => {
+        const li = document.createElement('li');
+        li.className = 'list-group-item d-flex justify-content-between align-items-center' + (idx===selectedIndex?' active':'');
+        li.innerHTML = `<span>${d.name} (${d.mac}) — Field ${d.field}</span>` +
+                       `<button class="btn btn-sm btn-danger delete-btn" data-mac="${d.mac}" data-name="${d.name}">刪除</button>`;
+        li.addEventListener('click', e => { if (!e.target.classList.contains('delete-btn')) { selectedIndex=idx; renderList(); renderChart(); }});
+        ul.appendChild(li);
+      });
+      document.querySelectorAll('.delete-btn').forEach(btn => btn.addEventListener('click', e => {
+        e.stopPropagation();
+        pendingDelete.mac  = btn.dataset.mac;
+        pendingDelete.name = btn.dataset.name;
+        confirmText.textContent = `確定要刪除裝置 "${pendingDelete.name}" (${pendingDelete.mac}) 嗎？`;
+        confirmModal.show();
+      }));
+    }
+
+    async function fetchTSData(force=false) {
+      const now = Date.now();
+      if (!tsData || force || now - tsLastFetch > CACHE_MS) {
+        tsLastFetch = now; tsData = await (await fetch(TS_READ_URL)).json();
+      }
+      return tsData;
+    }
+
+    async function renderChart(force=false) {
+      if (!devices.length) return;
+      chartSpinner.classList.remove('d-none');
+      const { feeds } = await fetchTSData(force);
+      const fieldId   = devices[selectedIndex].field;
+      const key       = 'field' + fieldId;
+      const validFeeds = feeds.filter(f => f[key] !== null);
+      const groups = {};
+      validFeeds.forEach(f => {
+        const dateStr = new Date(f.created_at).toLocaleDateString('zh-TW');
+        (groups[dateStr] || (groups[dateStr]=[])).push(f);
+      });
+      chartSpinner.classList.add('d-none');
+      window.chartInstances.forEach(c => c.destroy()); window.chartInstances = [];
+      const area = document.getElementById('charts-area'); area.innerHTML = '';
+      Object.entries(groups).forEach(([dateStr, entries]) => {
+        if (!entries.length) return;
+        const section = document.createElement('div'); section.className = 'mb-4';
+        const header  = document.createElement('h5'); header.textContent = dateStr; section.appendChild(header);
+        const canvas  = document.createElement('canvas'); section.appendChild(canvas); area.appendChild(section);
+        const labels  = entries.map(f => new Date(f.created_at).toLocaleTimeString('zh-TW',{hour12:false}));
+        const data    = entries.map(f => Number(f[key]));
+        const ctx     = canvas.getContext('2d');
+        const chart   = new Chart(ctx,{ type:'line', data:{labels,datasets:[{label:devices[selectedIndex].name,data,fill:false,tension:0.1}]},options:{responsive:true,spanGaps:false,scales:{y:{beginAtZero:true,ticks:{stepSize:1}}}} });
+        window.chartInstances.push(chart);
+      });
+    }
+
+    function showGlobalLoading(show) {
+      globalSpinner.classList.toggle('d-none', !show);
+    }
+
+    // 初始載入並顯示全域 loading
+    (async () => { showGlobalLoading(true); await loadList(); showGlobalLoading(false); })();
+  </script>
+</body>
+</html>
