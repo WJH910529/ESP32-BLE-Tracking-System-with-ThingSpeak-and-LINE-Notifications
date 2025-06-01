@@ -1,7 +1,6 @@
 
 # ESP32 BLE Tracking System with ThingSpeak and LINE Notifications 
 
-<!-- 改用 HTML，就能加上 width/height -->
 <p align="center">
   <img
     src="https://github.com/WJH910529/ESP32-BLE-Tracking-System-with-ThingSpeak-and-LINE-Notifications/blob/e5e5d1f3a770fbd4739be79f38983be48b53bcab/bluetooth.png"
@@ -83,6 +82,14 @@ This repository contains a complete solution for tracking BLE devices using an E
     -   Displays the current tracked list, with delete buttons.
         
     -   Renders historical “in-range / out-of-range” charts (per device) using Chart.js, fetching data from ThingSpeak.
+    <p align="center">
+    <img
+        src="https://github.com/WJH910529/ESP32-BLE-Tracking-System-with-ThingSpeak-and-LINE-Notifications/blob/64018abc4cad7578d8c49d05956a6f25416a7dc2/user_gui.png"
+        alt="Bluetooth Diagram"
+        width="500"
+    />
+    </p>
+
 
  ## System Architecture
 ![image](https://github.com/WJH910529/ESP32-BLE-Tracking-System-with-ThingSpeak-and-LINE-Notifications/blob/16f9d62a85be1036ca6d3af263c49867679a4e08/system%20architecture.jpg)
