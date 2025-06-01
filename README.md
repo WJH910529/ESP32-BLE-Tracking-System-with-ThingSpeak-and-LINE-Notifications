@@ -1,6 +1,7 @@
 
 # ESP32 BLE Tracking System with ThingSpeak and LINE Notifications 
-![image](https://github.com/WJH910529/ESP32-BLE-Tracking-System-with-ThingSpeak-and-LINE-Notifications/blob/e5e5d1f3a770fbd4739be79f38983be48b53bcab/bluetooth.png)
+<img src="https://github.com/.../bluetooth.png" alt="Bluetooth 圖示" width="50%"/>
+
 
 This repository contains a complete solution for tracking BLE devices using an ESP32, visualizing their status on ThingSpeak, and sending notifications via LINE. It includes:
 
