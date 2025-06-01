@@ -72,7 +72,7 @@ This repository contains a complete solution for tracking BLE devices using an E
         <img
             src="https://github.com/WJH910529/ESP32-BLE-Tracking-System-with-ThingSpeak-and-LINE-Notifications/blob/67c7b0752403ed7fb318b652203542479c333aec/picture/tihingspeak.png"
             alt="line"
-            height="500"
+            height="300"
         />
     </p>
 
