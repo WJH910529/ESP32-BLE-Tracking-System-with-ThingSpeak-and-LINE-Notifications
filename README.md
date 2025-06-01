@@ -74,7 +74,15 @@ This repository contains a complete solution for tracking BLE devices using an E
     -   When a tracked device is not found or RSSI falls below threshold, the ESP32 triggers a Google Apps Script endpoint (GAS) to broadcast a LINE message:
         
         > “⚠️ Beacon {name} ({MAC}) is not in range!”
-        
+
+        <p align="center">
+        <img
+            src="https://github.com/WJH910529/ESP32-BLE-Tracking-System-with-ThingSpeak-and-LINE-Notifications/blob/cc8467a4278434656e939fb9411d81c4d99523e3/linenotify.jpg"
+            alt="line"
+            width="600"
+        />
+        </p>
+
 -   **Web Dashboard**
     
     -   Allows end users to **add** or **remove** BLE devices (specify MAC address, human-readable name, and ThingSpeak field number).
@@ -85,8 +93,8 @@ This repository contains a complete solution for tracking BLE devices using an E
     <p align="center">
     <img
         src="https://github.com/WJH910529/ESP32-BLE-Tracking-System-with-ThingSpeak-and-LINE-Notifications/blob/64018abc4cad7578d8c49d05956a6f25416a7dc2/user_gui.png"
-        alt="Bluetooth Diagram"
-        width="500"
+        alt="gui"
+        width="666"
     />
     </p>
 
