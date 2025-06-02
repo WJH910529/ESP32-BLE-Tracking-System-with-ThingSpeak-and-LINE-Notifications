@@ -395,7 +395,7 @@ Follow these steps to set up and run the project end-to-end.
     -   **Local static server** (for testing)
 2.  **Update Endpoint URLs** inside `index.html` (at top of script):
     ```c
-	    const GAS_URL = 'https://script.google.com/macros/s/YYYYY/exec';                     // same as gasUrlForDatabase
+	    	const GAS_URL = 'https://script.google.com/macros/s/YYYYY/exec';                     // same as gasUrlForDatabase
 		const TS_READ_URL = 'https://api.thingspeak.com/channels/<<CHANNEL_ID>>/feeds.json?api_key=YOUR_READ_API_KEY&results=100';
     ```
     
