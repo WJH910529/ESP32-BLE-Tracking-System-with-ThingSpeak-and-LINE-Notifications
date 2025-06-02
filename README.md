@@ -399,7 +399,7 @@ Follow these steps to set up and run the project end-to-end.
 		const TS_READ_URL = 'https://api.thingspeak.com/channels/<<CHANNEL_ID>>/feeds.json?api_key=YOUR_READ_API_KEY&results=100';
     ```
     
-3.  Open the page in your browser:
+3.  Open the page in your browser
     
 4.  The dashboard will automatically:
     
