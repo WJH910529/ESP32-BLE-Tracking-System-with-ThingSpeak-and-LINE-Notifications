@@ -354,7 +354,7 @@ Follow these steps to set up and run the project end-to-end.
     
 2.  **Update WiFi Credentials**:
     ```c
-	    const char* ssid     = "YOUR_SSID";
+	    	const char* ssid     = "YOUR_SSID";
 		const char* password = "YOUR_PASSWORD";
     ```
     
@@ -366,7 +366,7 @@ Follow these steps to set up and run the project end-to-end.
     
 4.  **Update Google Apps Script URLs**:
     ```c
-	    const String gasUrlForLine     = "https://script.google.com/macros/s/XXXXX/exec"; // line-notify URL
+	   	const String gasUrlForLine     = "https://script.google.com/macros/s/XXXXX/exec"; // line-notify URL
 		const String gasUrlForDatabase = "https://script.google.com/macros/s/YYYYY/exec"; // db-management URL
     ``` 
     
