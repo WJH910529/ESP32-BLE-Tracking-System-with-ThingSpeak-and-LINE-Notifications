@@ -350,7 +350,7 @@ Follow these steps to set up and run the project end-to-end.
 
 ### 6. Configure and Upload ESP32 Firmware
 
-1.  Open the `esp32/ble_tracker.ino` file in the Arduino IDE (or PlatformIO).
+1.  Open the `ble_tracker.ino` file in the Arduino IDE (or PlatformIO).
     
 2.  **Update WiFi Credentials**:
     ```c
